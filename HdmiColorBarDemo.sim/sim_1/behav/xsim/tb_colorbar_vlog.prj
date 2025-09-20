@@ -1,0 +1,10 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  \
+"../../../../HdmiColorBarDemo.srcs/sources_1/ColorBarPixelGenerator.v" \
+"../../../../HdmiColorBarDemo.srcs/sim_1/new/tb_colorbar.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort
