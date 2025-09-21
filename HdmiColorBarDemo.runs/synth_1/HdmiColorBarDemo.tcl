@@ -86,8 +86,8 @@ read_vhdl -library xil_defaultlib {
   E:/desktop/HdmiColorBar/HdmiColorBarDemo.srcs/sources_1/TMDS_Encoder.vhd
   E:/desktop/HdmiColorBar/HdmiColorBarDemo.srcs/sources_1/InterfaceLogicConverter.vhd
 }
-read_ip -quiet e:/desktop/HdmiColorBar/HdmiColorBarDemo.srcs/sources_1/ip/cordic_0_1/cordic_0.xci
-set_property used_in_implementation false [get_files -all e:/desktop/HdmiColorBar/HdmiColorBarDemo.gen/sources_1/ip/cordic_0_1/cordic_0_ooc.xdc]
+read_ip -quiet e:/desktop/HdmiColorBar/HdmiColorBarDemo.srcs/sources_1/ip/cordic_0_2/cordic_0.xci
+set_property used_in_implementation false [get_files -all e:/desktop/HdmiColorBar/HdmiColorBarDemo.gen/sources_1/ip/cordic_0_2/cordic_0_ooc.xdc]
 
 OPTRACE "Adding files" END { }
 # Mark all dcp files as not used in implementation to prevent them from being

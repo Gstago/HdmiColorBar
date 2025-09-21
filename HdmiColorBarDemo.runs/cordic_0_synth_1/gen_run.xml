@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="cordic_0_synth_1" LaunchPart="xc7s15ftgb196-1" LaunchTime="1758427294">
+<GenRun Id="cordic_0_synth_1" LaunchPart="xc7s15ftgb196-1" LaunchTime="1758427876">
   <File Type="PA-TCL" Name="cordic_0.tcl"/>
   <File Type="RDS-PROPCONSTRS" Name="cordic_0_drc_synth.rpt"/>
   <File Type="REPORTS-TCL" Name="cordic_0_reports.tcl"/>
@@ -10,7 +10,7 @@
   <File Type="VDS-TIMINGSUMMARY" Name="cordic_0_timing_summary_synth.rpt"/>
   <File Type="VDS-TIMING-PB" Name="cordic_0_timing_summary_synth.pb"/>
   <FileSet Name="sources" Type="BlockSrcs" RelSrcDir="$PSRCDIR/cordic_0" RelGenDir="$PGENDIR/cordic_0">
-    <File Path="$PSRCDIR/sources_1/ip/cordic_0_1/cordic_0.xci">
+    <File Path="$PSRCDIR/sources_1/ip/cordic_0_2/cordic_0.xci">
       <FileInfo>
         <Attr Name="UsedIn" Val="synthesis"/>
         <Attr Name="UsedIn" Val="implementation"/>
@@ -23,7 +23,7 @@
     </Config>
   </FileSet>
   <FileSet Name="constrs_in" Type="BlockSrcs" RelSrcDir="$PSRCDIR/cordic_0" RelGenDir="$PGENDIR/cordic_0">
-    <File Path="$PSRCDIR/sources_1/ip/cordic_0_1/cordic_0.xci">
+    <File Path="$PSRCDIR/sources_1/ip/cordic_0_2/cordic_0.xci">
       <FileInfo>
         <Attr Name="UsedIn" Val="synthesis"/>
         <Attr Name="UsedIn" Val="implementation"/>
