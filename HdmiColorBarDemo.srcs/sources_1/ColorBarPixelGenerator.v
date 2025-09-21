@@ -206,7 +206,7 @@ wire        m_axis_dout_tvalid;
 reg         m_axis_dout_tready;
 
 
-cordic_ip cordic_inst (
+cordic_0 cordic_inst (
     .aclk                     (clk),
     .aresetn                  (~rst),
     .s_axis_cartesian_tdata   (s_axis_cartesian_tdata),
