@@ -246,9 +246,10 @@ wire signed [15:0] phase_fixed = m_axis_dout_tdata; // signed fix16_13
 wire signed [31:0] phase_ext = $signed({{16{phase_fixed[15]}}, phase_fixed}); // extend to 32-bit
 wire signed [31:0] phase_shifted = phase_ext + PI_Q; // now ~ [0..2*pi]*2^13
 
-// multiply: use wider reg
+// multiply: use wider reg 使用 input*SCALE 右移shift位来满足除以4pi的需求
 wire signed [63:0] mult_phase = phase_shifted * $signed(SCALE);
-wire [11:0] angle12 = mult_phase[SHIFT +: 12]; // take shifted 12 bits (equivalent to >> SHIFT)
+wire [11:0] angle12 = mult_phase[SHIFT +: 12]; // take shifted 12 bits (equivalent to >> SHIFT) // angle12 = (mult_phase >> SHIFT) & 12'hFFF;
+
 
 // NOTE: depending on synthesis tool, you might prefer: angle12 = (mult_phase >> SHIFT) & 12'hFFF;
 // Above slice uses bit-select for clarity
@@ -258,14 +259,14 @@ wire [11:0] angle12 = mult_phase[SHIFT +: 12]; // take shifted 12 bits (equivale
 
 // ---------------- phase_reg (frame aligned rotation offset) ----------------
 reg [11:0] phase_reg;
-parameter PHASE_STEP = 12'd32;
+parameter PHASE_STEP = 12'd32;//128帧一圈
 always @(posedge clk or posedge rst) begin
     if (rst) phase_reg <= 12'd0;
     else if (h_cnt == H_TOTAL - 1 && v_cnt == V_TOTAL - 1)
         phase_reg <= phase_reg + PHASE_STEP;
 end
 
-wire [11:0] angle_shift = (angle12 + phase_reg) & 12'hFFF;
+wire [11:0] angle_shift = (angle12 + phase_reg) & 12'hFFF;//保险写法
 wire [2:0] sector = angle_shift[11:9]; // top 3 bits for 8 sectors
 
 // ---------------- color output (aligned with cordic_valid & video_active_aligned) ----------------
