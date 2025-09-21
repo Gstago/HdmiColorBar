@@ -188,7 +188,7 @@ assign y_frac16 = $signed(tmp_y / RADIUS);
 // The IP in your screenshot expects S_AXIS_CARTESIAN.TDATA with {IMAG(31:16), REAL(15:0)}
 wire [31:0] s_axis_cartesian_tdata = { y_frac16, x_frac16 }; // IMAG = y, REAL = x (match IP)
 reg s_axis_cartesian_tvalid;
-wire s_axis_cartesian_tready; // driven by IP
+
 
 // Drive tvalid simply when pixel is active. If your IP's tready can be 0 occasionally,
 // consider adding a FIFO or hold logic so you don't lose samples.
@@ -203,7 +203,7 @@ end
 
 wire [15:0] m_axis_dout_tdata;
 wire        m_axis_dout_tvalid;
-reg         m_axis_dout_tready;
+
 
 
 cordic_0 cordic_inst (
@@ -211,18 +211,12 @@ cordic_0 cordic_inst (
     .aresetn                  (~rst),
     .s_axis_cartesian_tdata   (s_axis_cartesian_tdata),
     .s_axis_cartesian_tvalid  (s_axis_cartesian_tvalid),
-    .s_axis_cartesian_tready  (s_axis_cartesian_tready),
     .m_axis_dout_tdata        (m_axis_dout_tdata),
-    .m_axis_dout_tvalid       (m_axis_dout_tvalid),
-    .m_axis_dout_tready       (m_axis_dout_tready)
+    .m_axis_dout_tvalid       (m_axis_dout_tvalid)
 );
 
 
-// For safety, keep m_axis_dout_tready high to always accept IP output
-always @(posedge clk or posedge rst) begin
-    if (rst) m_axis_dout_tready <= 1'b1;
-    else m_axis_dout_tready <= 1'b1;
-end
+
 
 // ---------------- align video_active by IP latency ----------------
 // Use the latency printed by IP (your screenshot shows Latency = 20).

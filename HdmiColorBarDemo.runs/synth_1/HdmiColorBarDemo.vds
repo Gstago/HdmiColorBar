@@ -3,8 +3,8 @@
 # SW Build 5239630 on Fri Nov 08 22:35:27 MST 2024
 # IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
 # SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
-# Start of session at: Sun Sep 21 12:02:10 2025
-# Process ID         : 24788
+# Start of session at: Sun Sep 21 12:04:06 2025
+# Process ID         : 21016
 # Current directory  : E:/desktop/HdmiColorBar/HdmiColorBarDemo.runs/synth_1
 # Command line       : vivado.exe -log HdmiColorBarDemo.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source HdmiColorBarDemo.tcl
 # Log file           : E:/desktop/HdmiColorBar/HdmiColorBarDemo.runs/synth_1/HdmiColorBarDemo.vds
@@ -19,7 +19,7 @@
 # Host memory        : 16779 MB
 # Swap memory        : 15569 MB
 # Total Virtual      : 32349 MB
-# Available Virtual  : 16755 MB
+# Available Virtual  : 18169 MB
 #-----------------------------------------------------------
 source HdmiColorBarDemo.tcl -notrace
 Command: synth_design -top HdmiColorBarDemo -part xc7s15ftgb196-1
@@ -29,21 +29,27 @@ INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7s15'
 INFO: [Device 21-403] Loading part xc7s15ftgb196-1
 INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
 INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
-INFO: [Synth 8-7075] Helper process launched with PID 4820
+INFO: [Synth 8-7075] Helper process launched with PID 30480
 ---------------------------------------------------------------------------------
-Starting RTL Elaboration : Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 990.383 ; gain = 465.754
+Starting RTL Elaboration : Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 1000.582 ; gain = 463.664
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-6157] synthesizing module 'HdmiColorBarDemo' [E:/desktop/HdmiColorBar/HdmiColorBarDemo.srcs/sources_1/HdmiColorBarDemo.v:1]
 INFO: [Synth 8-6157] synthesizing module 'ColorBarPixelGenerator' [E:/desktop/HdmiColorBar/HdmiColorBarDemo.srcs/sources_1/ColorBarPixelGenerator.v:4]
-ERROR: [Synth 8-439] module 'cordic_ip' not found [E:/desktop/HdmiColorBar/HdmiColorBarDemo.srcs/sources_1/ColorBarPixelGenerator.v:209]
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [E:/desktop/HdmiColorBar/HdmiColorBarDemo.srcs/sources_1/ColorBarPixelGenerator.v:209]
+INFO: [Synth 8-6157] synthesizing module 'cordic_0' [E:/desktop/HdmiColorBar/HdmiColorBarDemo.runs/synth_1/.Xil/Vivado-21016-LAPTOP-UISPT8T4/realtime/cordic_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'cordic_0' (0#1) [E:/desktop/HdmiColorBar/HdmiColorBarDemo.runs/synth_1/.Xil/Vivado-21016-LAPTOP-UISPT8T4/realtime/cordic_0_stub.v:6]
+ERROR: [Synth 8-11365] for the instance 'cordic_inst' of module 'cordic_0' declared at 'E:/desktop/HdmiColorBar/HdmiColorBarDemo.runs/synth_1/.Xil/Vivado-21016-LAPTOP-UISPT8T4/realtime/cordic_0_stub.v:6', named port connection 'aresetn' does not exist [E:/desktop/HdmiColorBar/HdmiColorBarDemo.srcs/sources_1/ColorBarPixelGenerator.v:211]
+ERROR: [Synth 8-11365] for the instance 'cordic_inst' of module 'cordic_0' declared at 'E:/desktop/HdmiColorBar/HdmiColorBarDemo.runs/synth_1/.Xil/Vivado-21016-LAPTOP-UISPT8T4/realtime/cordic_0_stub.v:6', named port connection 's_axis_cartesian_tready' does not exist [E:/desktop/HdmiColorBar/HdmiColorBarDemo.srcs/sources_1/ColorBarPixelGenerator.v:214]
+ERROR: [Synth 8-11365] for the instance 'cordic_inst' of module 'cordic_0' declared at 'E:/desktop/HdmiColorBar/HdmiColorBarDemo.runs/synth_1/.Xil/Vivado-21016-LAPTOP-UISPT8T4/realtime/cordic_0_stub.v:6', named port connection 'm_axis_dout_tready' does not exist [E:/desktop/HdmiColorBar/HdmiColorBarDemo.srcs/sources_1/ColorBarPixelGenerator.v:217]
+INFO: [Synth 8-226] default block is never used [E:/desktop/HdmiColorBar/HdmiColorBarDemo.srcs/sources_1/ColorBarPixelGenerator.v:282]
 ERROR: [Synth 8-6156] failed synthesizing module 'ColorBarPixelGenerator' [E:/desktop/HdmiColorBar/HdmiColorBarDemo.srcs/sources_1/ColorBarPixelGenerator.v:4]
 ERROR: [Synth 8-6156] failed synthesizing module 'HdmiColorBarDemo' [E:/desktop/HdmiColorBar/HdmiColorBarDemo.srcs/sources_1/HdmiColorBarDemo.v:1]
 ---------------------------------------------------------------------------------
-Finished RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 1095.711 ; gain = 571.082
+Finished RTL Elaboration : Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 1106.379 ; gain = 569.461
 ---------------------------------------------------------------------------------
 RTL Elaboration failed
 INFO: [Common 17-83] Releasing license: Synthesis
-8 Infos, 0 Warnings, 0 Critical Warnings and 4 Errors encountered.
+11 Infos, 1 Warnings, 0 Critical Warnings and 6 Errors encountered.
 synth_design failed
 ERROR: [Common 17-69] Command failed: Synthesis failed - please see the console or run log file for details
-INFO: [Common 17-206] Exiting Vivado at Sun Sep 21 12:02:21 2025...
+INFO: [Common 17-206] Exiting Vivado at Sun Sep 21 12:04:16 2025...
