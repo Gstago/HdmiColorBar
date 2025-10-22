@@ -160,104 +160,104 @@ localparam integer CY_INT = V_ACTIVE / 2;
 wire signed [13:0] dx = $signed({1'b0, active_x}) - $signed({1'b0, CX_INT[11:0]});
 wire signed [13:0] dy = $signed({1'b0, active_y}) - $signed({1'b0, CY_INT[11:0]});
 
-// ---------------- scale to IP fixed-point format ----------------
-// IP screenshot used fix16_14 (SignedFraction with 14 fractional bits).
-localparam integer FBITS = 14;
-localparam integer INPUT_WIDTH = 16; // IP Input Width
-// Choose RADIUS as half of larger dimension (compile-time constant), ensures |dx|/RADIUS <= 1
-localparam integer RADIUS = ( (H_ACTIVE > V_ACTIVE) ? H_ACTIVE : V_ACTIVE ) / 2;
+// // ---------------- scale to IP fixed-point format ----------------
+// // IP screenshot used fix16_14 (SignedFraction with 14 fractional bits).
+// localparam integer FBITS = 14;
+// localparam integer INPUT_WIDTH = 16; // IP Input Width
+// // Choose RADIUS as half of larger dimension (compile-time constant), ensures |dx|/RADIUS <= 1
+// localparam integer RADIUS = ( (H_ACTIVE > V_ACTIVE) ? H_ACTIVE : V_ACTIVE ) / 2;
 
-// temp wide regs for scaling
-reg signed [31:0] tmp_x;
-reg signed [31:0] tmp_y;
-wire signed [15:0] x_frac16;
-wire signed [15:0] y_frac16;
+// // temp wide regs for scaling
+// reg signed [31:0] tmp_x;
+// reg signed [31:0] tmp_y;
+// wire signed [15:0] x_frac16;
+// wire signed [15:0] y_frac16;
 
-always @(*) begin
-    // sign-extend dx/dy to 32 bits, multiply by (1<<FBITS)
-    tmp_x = $signed({{18{dx[13]}}, dx}) * (1 <<< FBITS); // dx * 2^FBITS
-    tmp_y = $signed({{18{dy[13]}}, dy}) * (1 <<< FBITS);
-end
+// always @(*) begin
+//     // sign-extend dx/dy to 32 bits, multiply by (1<<FBITS)
+//     tmp_x = $signed({{18{dx[13]}}, dx}) * (1 <<< FBITS); // dx * 2^FBITS
+//     tmp_y = $signed({{18{dy[13]}}, dy}) * (1 <<< FBITS);
+// end
 
-// divide by constant RADIUS (synthesis will optimize division by constant)
-assign x_frac16 = $signed(tmp_x / RADIUS); // Q1.FBITS in 16-bit signed
-assign y_frac16 = $signed(tmp_y / RADIUS);
+// // divide by constant RADIUS (synthesis will optimize division by constant)
+// assign x_frac16 = $signed(tmp_x / RADIUS); // Q1.FBITS in 16-bit signed
+// assign y_frac16 = $signed(tmp_y / RADIUS);
 
-// ---------------- AXI4-Stream interface to CORDIC IP (example instance) ----------------
-// NOTE: Replace 'cordic_ip' with your generated IP wrapper name if different.
-// The IP in your screenshot expects S_AXIS_CARTESIAN.TDATA with {IMAG(31:16), REAL(15:0)}
-wire [31:0] s_axis_cartesian_tdata = { y_frac16, x_frac16 }; // IMAG = y, REAL = x (match IP)
-reg s_axis_cartesian_tvalid;
-
-
-// Drive tvalid simply when pixel is active. If your IP's tready can be 0 occasionally,
-// consider adding a FIFO or hold logic so you don't lose samples.
-always @(posedge clk or posedge rst) begin
-    if (rst) s_axis_cartesian_tvalid <= 1'b0;
-    else s_axis_cartesian_tvalid <= video_active; // simple approach: assert when pixel valid
-end
-
-// ---------------- instantiate cordic IP wrapper (AXIS) ----------------
-// Replace "cordic_ip" with the actual name of the generated IP (eg. cordic_0)
-// The ports below are the common AXIS ports; adjust names to your wrapper exactly.
-
-wire [15:0] m_axis_dout_tdata;
-wire        m_axis_dout_tvalid;
+// // ---------------- AXI4-Stream interface to CORDIC IP (example instance) ----------------
+// // NOTE: Replace 'cordic_ip' with your generated IP wrapper name if different.
+// // The IP in your screenshot expects S_AXIS_CARTESIAN.TDATA with {IMAG(31:16), REAL(15:0)}
+// wire [31:0] s_axis_cartesian_tdata = { y_frac16, x_frac16 }; // IMAG = y, REAL = x (match IP)
+// reg s_axis_cartesian_tvalid;
 
 
+// // Drive tvalid simply when pixel is active. If your IP's tready can be 0 occasionally,
+// // consider adding a FIFO or hold logic so you don't lose samples.
+// always @(posedge clk or posedge rst) begin
+//     if (rst) s_axis_cartesian_tvalid <= 1'b0;
+//     else s_axis_cartesian_tvalid <= video_active; // simple approach: assert when pixel valid
+// end
 
-cordic_0 cordic_inst (
-    .aclk                     (clk),
-    .aresetn                  (~rst),
-    .s_axis_cartesian_tdata   (s_axis_cartesian_tdata),
-    .s_axis_cartesian_tvalid  (s_axis_cartesian_tvalid),
-    .m_axis_dout_tdata        (m_axis_dout_tdata),
-    .m_axis_dout_tvalid       (m_axis_dout_tvalid)
-);
+// // ---------------- instantiate cordic IP wrapper (AXIS) ----------------
+// // Replace "cordic_ip" with the actual name of the generated IP (eg. cordic_0)
+// // The ports below are the common AXIS ports; adjust names to your wrapper exactly.
+
+// wire [15:0] m_axis_dout_tdata;
+// wire        m_axis_dout_tvalid;
 
 
 
-
-// ---------------- align video_active by IP latency ----------------
-// Use the latency printed by IP (your screenshot shows Latency = 20).
-// If your IP is configured differently, change CORDIC_LATENCY accordingly.
-localparam integer CORDIC_LATENCY = 20;
-reg [CORDIC_LATENCY-1:0] video_pipe;
-always @(posedge clk or posedge rst) begin
-    if (rst) video_pipe <= {CORDIC_LATENCY{1'b0}};
-    else video_pipe <= {video_pipe[CORDIC_LATENCY-2:0], video_active};
-end
-wire video_active_aligned = video_pipe[CORDIC_LATENCY-1];
-
-// ---------------- convert IP output phase -> angle12 (0..4095 mapping 0..2pi) ----------------
-// We assume IP outputs phase in signed fixed-point radians format (fix16_13):
-// m_axis_dout_tdata is signed 16-bit representing theta * 2^13 (radians).
-// Convert signed radians in [-pi,pi] to unsigned [0..4095]:
-// angle12 = ((theta + pi) / (2*pi)) * 4096
-// Implement integer math: angle12 = ((phase_q + PI_Q) * SCALE) >> SHIFT
-// where PI_Q = round(pi * 2^13), SCALE/SHIFT approximate 4096/(2*pi*2^13) = 1/(4*pi)
-// We'll use SCALE = round(1/(4*pi) * 2^24) = 1336934, SHIFT = 24
-
-localparam integer PI_Q = 25736; // round(pi * 2^13) = 3.141592653589793*8192
-localparam integer SCALE = 1336934; // round(1/(4*pi) * 2^24)
-localparam integer SHIFT = 24;
-
-wire signed [15:0] phase_fixed = m_axis_dout_tdata; // signed fix16_13
-wire signed [31:0] phase_ext = $signed({{16{phase_fixed[15]}}, phase_fixed}); // extend to 32-bit
-wire signed [31:0] phase_shifted = phase_ext + PI_Q; // now ~ [0..2*pi]*2^13
-
-// multiply: use wider reg 使用 input*SCALE 右移shift位来满足除以4pi的需求
-wire signed [63:0] mult_phase = phase_shifted * $signed(SCALE);
-wire [11:0] angle12 = mult_phase[SHIFT +: 12]; // take shifted 12 bits (equivalent to >> SHIFT) // angle12 = (mult_phase >> SHIFT) & 12'hFFF;
+// cordic_0 cordic_inst (
+//     .aclk                     (clk),
+//     .aresetn                  (~rst),
+//     .s_axis_cartesian_tdata   (s_axis_cartesian_tdata),
+//     .s_axis_cartesian_tvalid  (s_axis_cartesian_tvalid),
+//     .m_axis_dout_tdata        (m_axis_dout_tdata),
+//     .m_axis_dout_tvalid       (m_axis_dout_tvalid)
+// );
 
 
-// NOTE: depending on synthesis tool, you might prefer: angle12 = (mult_phase >> SHIFT) & 12'hFFF;
-// Above slice uses bit-select for clarity
 
-// If your IP outputs angle in a different format (e.g. unsigned 0..2pi mapped to full 16-bit),
-// replace the conversion accordingly.
 
-// ---------------- phase_reg (frame aligned rotation offset) ----------------
+// // ---------------- align video_active by IP latency ----------------
+// // Use the latency printed by IP (your screenshot shows Latency = 20).
+// // If your IP is configured differently, change CORDIC_LATENCY accordingly.
+// localparam integer CORDIC_LATENCY = 20;
+// reg [CORDIC_LATENCY-1:0] video_pipe;
+// always @(posedge clk or posedge rst) begin
+//     if (rst) video_pipe <= {CORDIC_LATENCY{1'b0}};
+//     else video_pipe <= {video_pipe[CORDIC_LATENCY-2:0], video_active};
+// end
+// wire video_active_aligned = video_pipe[CORDIC_LATENCY-1];
+
+// // ---------------- convert IP output phase -> angle12 (0..4095 mapping 0..2pi) ----------------
+// // We assume IP outputs phase in signed fixed-point radians format (fix16_13):
+// // m_axis_dout_tdata is signed 16-bit representing theta * 2^13 (radians).
+// // Convert signed radians in [-pi,pi] to unsigned [0..4095]:
+// // angle12 = ((theta + pi) / (2*pi)) * 4096
+// // Implement integer math: angle12 = ((phase_q + PI_Q) * SCALE) >> SHIFT
+// // where PI_Q = round(pi * 2^13), SCALE/SHIFT approximate 4096/(2*pi*2^13) = 1/(4*pi)
+// // We'll use SCALE = round(1/(4*pi) * 2^24) = 1336934, SHIFT = 24
+
+// localparam integer PI_Q = 25736; // round(pi * 2^13) = 3.141592653589793*8192
+// localparam integer SCALE = 1336934; // round(1/(4*pi) * 2^24)
+// localparam integer SHIFT = 24;
+
+// wire signed [15:0] phase_fixed = m_axis_dout_tdata; // signed fix16_13
+// wire signed [31:0] phase_ext = $signed({{16{phase_fixed[15]}}, phase_fixed}); // extend to 32-bit
+// wire signed [31:0] phase_shifted = phase_ext + PI_Q; // now ~ [0..2*pi]*2^13
+
+// // multiply: use wider reg 使用 input*SCALE 右移shift位来满足除以4pi的需求
+// wire signed [63:0] mult_phase = phase_shifted * $signed(SCALE);
+// wire [11:0] angle12 = mult_phase[SHIFT +: 12]; // take shifted 12 bits (equivalent to >> SHIFT) // angle12 = (mult_phase >> SHIFT) & 12'hFFF;
+
+
+// // NOTE: depending on synthesis tool, you might prefer: angle12 = (mult_phase >> SHIFT) & 12'hFFF;
+// // Above slice uses bit-select for clarity
+
+// // If your IP outputs angle in a different format (e.g. unsigned 0..2pi mapped to full 16-bit),
+// // replace the conversion accordingly.
+
+// // ---------------- phase_reg (frame aligned rotation offset) ----------------
 reg [11:0] phase_reg;
 parameter PHASE_STEP = 12'd32;//128帧一圈
 always @(posedge clk or posedge rst) begin
@@ -266,15 +266,64 @@ always @(posedge clk or posedge rst) begin
         phase_reg <= phase_reg + PHASE_STEP;
 end
 
-wire [11:0] angle_shift = (angle12 + phase_reg) & 12'hFFF;//保险写法
-wire [2:0] sector = angle_shift[11:9]; // top 3 bits for 8 sectors
+// wire [11:0] angle_shift = (angle12 + phase_reg) & 12'hFFF;//保险写法
+// wire [2:0] sector = angle_shift[11:9]; // top 3 bits for 8 sectors
 
-// ---------------- color output (aligned with cordic_valid & video_active_aligned) ----------------
+// // ---------------- color output (aligned with cordic_valid & video_active_aligned) ----------------
+// always @(posedge clk or posedge rst) begin
+//     if (rst) begin
+//         rgb_r_reg <= 8'h00; rgb_g_reg <= 8'h00; rgb_b_reg <= 8'h00;
+//     end else if (m_axis_dout_tvalid && video_active_aligned) begin
+//         case (sector)
+//             3'd0: begin rgb_r_reg <= WHITE_R;   rgb_g_reg <= WHITE_G;   rgb_b_reg <= WHITE_B; end
+//             3'd1: begin rgb_r_reg <= YELLOW_R;  rgb_g_reg <= YELLOW_G;  rgb_b_reg <= YELLOW_B; end
+//             3'd2: begin rgb_r_reg <= CYAN_R;    rgb_g_reg <= CYAN_G;    rgb_b_reg <= CYAN_B; end
+//             3'd3: begin rgb_r_reg <= GREEN_R;   rgb_g_reg <= GREEN_G;   rgb_b_reg <= GREEN_B; end
+//             3'd4: begin rgb_r_reg <= MAGENTA_R; rgb_g_reg <= MAGENTA_G; rgb_b_reg <= MAGENTA_B; end
+//             3'd5: begin rgb_r_reg <= RED_R;     rgb_g_reg <= RED_G;     rgb_b_reg <= RED_B; end
+//             3'd6: begin rgb_r_reg <= BLUE_R;    rgb_g_reg <= BLUE_G;    rgb_b_reg <= BLUE_B; end
+//             3'd7: begin rgb_r_reg <= BLACK_R;   rgb_g_reg <= BLACK_G;   rgb_b_reg <= BLACK_B; end
+//             default: begin rgb_r_reg <= 8'h00; rgb_g_reg <= 8'h00; rgb_b_reg <= 8'h00; end
+//         endcase
+//     end else begin
+//         rgb_r_reg <= 8'h00; rgb_g_reg <= 8'h00; rgb_b_reg <= 8'h00;
+//     end
+// end
+// ---------------- rotated stripe color mode ----------------
+
+// 1. 获取旋转角度对应的 sin/cos（使用简单查表方式）
+// 这里我们用 64 项 LUT（如果资源够，也可以扩成 256 项）
+// LUT 范围：0~2π 对应 12 位相位（0~4095）
+reg signed [15:0] cos_lut [0:63];
+reg signed [15:0] sin_lut [0:63];
+initial begin : init_lut
+    integer i;
+    real ang;
+    for (i = 0; i < 64; i = i + 1) begin
+        ang = 2.0 * 3.141592653589793 * i / 64.0;
+        cos_lut[i] = $rtoi($cos(ang) * 32767.0);  // Q1.15格式
+        sin_lut[i] = $rtoi($sin(ang) * 32767.0);
+    end
+end
+
+wire [5:0] lut_idx = phase_reg[11:6];  // 取高6位做查表索引
+wire signed [15:0] cos_phi = cos_lut[lut_idx];
+wire signed [15:0] sin_phi = sin_lut[lut_idx];
+
+// 2. 旋转坐标：x' = dx*cosφ - dy*sinφ
+wire signed [31:0] dx_cos = dx * cos_phi;
+wire signed [31:0] dy_sin = dy * sin_phi;
+wire signed [15:0] x_rot = (dx_cos - dy_sin) >>> 15; // 结果回到像素尺度
+
+// 3. 用 x_rot 的高几位决定颜色带
+// 例如每 64 像素换一种颜色，可调整条宽
+
+// 4. 输出颜色
 always @(posedge clk or posedge rst) begin
     if (rst) begin
         rgb_r_reg <= 8'h00; rgb_g_reg <= 8'h00; rgb_b_reg <= 8'h00;
-    end else if (m_axis_dout_tvalid && video_active_aligned) begin
-        case (sector)
+    end else if (video_active) begin
+        case (x_rot[8:6])
             3'd0: begin rgb_r_reg <= WHITE_R;   rgb_g_reg <= WHITE_G;   rgb_b_reg <= WHITE_B; end
             3'd1: begin rgb_r_reg <= YELLOW_R;  rgb_g_reg <= YELLOW_G;  rgb_b_reg <= YELLOW_B; end
             3'd2: begin rgb_r_reg <= CYAN_R;    rgb_g_reg <= CYAN_G;    rgb_b_reg <= CYAN_B; end
@@ -283,7 +332,6 @@ always @(posedge clk or posedge rst) begin
             3'd5: begin rgb_r_reg <= RED_R;     rgb_g_reg <= RED_G;     rgb_b_reg <= RED_B; end
             3'd6: begin rgb_r_reg <= BLUE_R;    rgb_g_reg <= BLUE_G;    rgb_b_reg <= BLUE_B; end
             3'd7: begin rgb_r_reg <= BLACK_R;   rgb_g_reg <= BLACK_G;   rgb_b_reg <= BLACK_B; end
-            default: begin rgb_r_reg <= 8'h00; rgb_g_reg <= 8'h00; rgb_b_reg <= 8'h00; end
         endcase
     end else begin
         rgb_r_reg <= 8'h00; rgb_g_reg <= 8'h00; rgb_b_reg <= 8'h00;

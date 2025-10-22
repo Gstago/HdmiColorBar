@@ -3,10 +3,10 @@
 # SW Build 5239630 on Fri Nov 08 22:35:27 MST 2024
 # IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
 # SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
-# Start of session at: Wed Sep 17 12:09:13 2025
-# Process ID         : 28500
+# Start of session at: Mon Sep 22 16:45:16 2025
+# Process ID         : 22068
 # Current directory  : E:/desktop/HdmiColorBar
-# Command line       : vivado.exe -gui_launcher_event rodinguilauncherevent28292 E:\desktop\HdmiColorBar\HdmiColorBarDemo.xpr
+# Command line       : vivado.exe -gui_launcher_event rodinguilauncherevent28948 E:\desktop\HdmiColorBar\HdmiColorBarDemo.xpr
 # Log file           : E:/desktop/HdmiColorBar/vivado.log
 # Journal file       : E:/desktop/HdmiColorBar\vivado.jou
 # Running On         : LAPTOP-UISPT8T4
@@ -19,7 +19,7 @@
 # Host memory        : 16779 MB
 # Swap memory        : 15569 MB
 # Total Virtual      : 32349 MB
-# Available Virtual  : 21901 MB
+# Available Virtual  : 11793 MB
 #-----------------------------------------------------------
 start_gui
 open_project E:/desktop/HdmiColorBar/HdmiColorBarDemo.xpr

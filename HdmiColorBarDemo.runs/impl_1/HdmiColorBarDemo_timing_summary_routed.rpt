@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (win64) Build 5239630 Fri Nov 08 22:35:27 MST 2024
-| Date         : Sun Sep 21 12:13:24 2025
+| Date         : Wed Oct 22 11:43:20 2025
 | Host         : LAPTOP-UISPT8T4 running 64-bit major release  (build 9200)
 | Command      : report_timing_summary -max_paths 10 -file HdmiColorBarDemo_timing_summary_routed.rpt -pb HdmiColorBarDemo_timing_summary_routed.pb -rpx HdmiColorBarDemo_timing_summary_routed.rpx -warn_on_violation
 | Design       : HdmiColorBarDemo
@@ -41,9 +41,10 @@ Timing Summary Report
 | ------------------
 ------------------------------------------------------------------------------------------------
 
-Rule       Severity          Description                  Violations  
----------  ----------------  ---------------------------  ----------  
-TIMING-17  Critical Warning  Non-clocked sequential cell  1000        
+Rule       Severity          Description                                 Violations  
+---------  ----------------  ------------------------------------------  ----------  
+TIMING-17  Critical Warning  Non-clocked sequential cell                 95          
+SYNTH-6    Warning           Timing of a RAM block might be sub-optimal  2           
 
 Note: This report is based on the most recent report_methodology run and may not be up-to-date. Run report_methodology on the current design for the latest report.
 
@@ -53,10 +54,10 @@ check_timing report
 
 Table of Contents
 -----------------
-1. checking no_clock (1079)
+1. checking no_clock (95)
 2. checking constant_clock (0)
 3. checking pulse_width_clock (0)
-4. checking unconstrained_internal_endpoints (1184)
+4. checking unconstrained_internal_endpoints (220)
 5. checking no_input_delay (0)
 6. checking no_output_delay (4)
 7. checking multiple_clock (0)
@@ -66,9 +67,9 @@ Table of Contents
 11. checking partial_output_delay (0)
 12. checking latch_loops (0)
 
-1. checking no_clock (1079)
----------------------------
- There are 1079 register/latch pins with no clock driven by root clock pin: sys_clk (HIGH)
+1. checking no_clock (95)
+-------------------------
+ There are 95 register/latch pins with no clock driven by root clock pin: sys_clk (HIGH)
 
 
 2. checking constant_clock (0)
@@ -81,9 +82,9 @@ Table of Contents
  There are 0 register/latch pins which need pulse_width check
 
 
-4. checking unconstrained_internal_endpoints (1184)
----------------------------------------------------
- There are 1184 pins that are not constrained for maximum delay. (HIGH)
+4. checking unconstrained_internal_endpoints (220)
+--------------------------------------------------
+ There are 220 pins that are not constrained for maximum delay. (HIGH)
 
  There are 0 pins that are not constrained for maximum delay due to constant clock.
 
