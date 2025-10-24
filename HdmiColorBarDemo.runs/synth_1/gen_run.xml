@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="synth_1" LaunchPart="xc7s15ftgb196-1" LaunchTime="1761104508">
+<GenRun Id="synth_1" LaunchPart="xc7s15ftgb196-1" LaunchTime="1761225648">
   <File Type="REPORTS-TCL" Name="HdmiColorBarDemo_reports.tcl"/>
   <File Type="RDS-UTIL" Name="HdmiColorBarDemo_utilization_synth.rpt"/>
   <File Type="RDS-UTIL-PB" Name="HdmiColorBarDemo_utilization_synth.pb"/>
@@ -106,4 +106,5 @@
     <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2020"/>
     <Step Id="synth_design"/>
   </Strategy>
+  <BlockFileSet Type="BlockSrcs" Name="cordic_1"/>
 </GenRun>

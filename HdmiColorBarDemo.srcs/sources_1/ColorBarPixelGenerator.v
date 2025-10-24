@@ -242,7 +242,6 @@ end
 
 cordic_1 cordic_inst (
     .aclk(clk),
-    .aresetn(~rst),
 
     // X, Y 输入流
     .s_axis_cartesian_tdata  (s_axis_cartesian_tdata),    // {Y_in, X_in}

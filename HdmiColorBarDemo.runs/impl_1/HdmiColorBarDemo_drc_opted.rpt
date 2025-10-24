@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.2 (win64) Build 5239630 Fri Nov 08 22:35:27 MST 2024
-| Date         : Wed Oct 22 11:43:05 2025
+| Date         : Thu Oct 23 21:21:49 2025
 | Host         : LAPTOP-UISPT8T4 running 64-bit major release  (build 9200)
 | Command      : report_drc -file HdmiColorBarDemo_drc_opted.rpt -pb HdmiColorBarDemo_drc_opted.pb -rpx HdmiColorBarDemo_drc_opted.rpx
 | Design       : HdmiColorBarDemo
@@ -24,12 +24,12 @@ Table of Contents
       Design limits: <entire design considered>
            Ruledeck: default
              Max checks: <unlimited>
-             Checks found: 4
+             Checks found: 3
 +----------+----------+-----------------------------------------------------+--------+
 | Rule     | Severity | Description                                         | Checks |
 +----------+----------+-----------------------------------------------------+--------+
 | CFGBVS-1 | Warning  | Missing CFGBVS and CONFIG_VOLTAGE Design Properties | 1      |
-| DPIP-1   | Warning  | Input pipelining                                    | 3      |
+| DPIP-1   | Warning  | Input pipelining                                    | 2      |
 +----------+----------+-----------------------------------------------------+--------+
 
 2. REPORT DETAILS
@@ -49,17 +49,12 @@ Related violations: <none>
 
 DPIP-1#1 Warning
 Input pipelining  
-DSP color_bar/dx_cos input color_bar/dx_cos/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+DSP color_bar/phase_mult input color_bar/phase_mult/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
 Related violations: <none>
 
 DPIP-1#2 Warning
 Input pipelining  
-DSP color_bar/x_rot0 input color_bar/x_rot0/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
-Related violations: <none>
-
-DPIP-1#3 Warning
-Input pipelining  
-DSP color_bar/x_rot0 input color_bar/x_rot0/C[47:0] is not pipelined. Pipelining DSP48 input will improve performance.
+DSP color_bar/tmp_x_src_mult input color_bar/tmp_x_src_mult/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
 Related violations: <none>
 
 
